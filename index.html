@@ -32,7 +32,37 @@
         }
 
         /* ---------------------------------- 全局布局 ---------------------------------- */
-
+.modal {
+    display: none; 
+    position: fixed;     /* 改为固定定位，相对于屏幕 */
+    z-index: 9999;      /* 确保在最上层 */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* 半透明背景 */
+}
+.modal-content {
+    background-color: #1a1a1a;
+    margin: auto;
+    padding: 30px;
+    border: 2px solid var(--color-primary);
+    width: 80%;
+    max-width: 500px;
+    border-radius: 10px;
+    position: absolute;  /* 绝对定位配合 transform 居中 */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+    text-align: center;
+}
+#modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
         .header {
             width: 90%;
             max-width: 1600px; /* 适配 1920 宽度 */
@@ -739,6 +769,7 @@
                 
                 // 主计时器
                 gameState.timerInterval = setInterval(() => {
+
                     if (gameState.timer > 0) {
                         gameState.timer--;
                         // Admin 页面只需要更新 gameState，Scoreboard 页面会自动同步
@@ -753,7 +784,6 @@
                         gameState.isTimerRunning = false;
                         
                         recordPeriodScore();
-                        saveGameState(); // 状态改变，保存
 
                         if (gameState.currentPeriod < gameState.totalPeriods) {
                              showModal('msg-period-end', gameState.currentPeriod, gameState.scoreA, gameState.scoreB);
