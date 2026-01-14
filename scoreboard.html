@@ -297,7 +297,7 @@
             teamA: "TEAM A", teamB: "TEAM B",
             refereeMain: "-", refereeVice: "-",
             coachA: "-", coachB: "-",
-            periodDuration: 300, currentPeriod: 1,
+            periodDuration: 300, currentPeriod: 1, totalPeriods: 4, // 默认4节
             timer: 300, shotClock: 24,
             scoreA: 0, scoreB: 0, foulsA: 0, foulsB: 0,
             timeoutsA: 0, timeoutsB: 0,
@@ -323,12 +323,15 @@ function renderUI() {
 
     // --- 加时赛逻辑开始 ---
     let periodText = "";
-    if (gameState.currentPeriod <= 4) {
-        // 常规赛：第 1, 2, 3, 4 节
+    // 动态使用 gameState.totalPeriods，而不是硬编码的 4
+    const totalPeriods = gameState.totalPeriods || 4; 
+
+    if (gameState.currentPeriod <= totalPeriods) {
+        // 常规赛
         periodText = `${getTranslation('period-label')} ${gameState.currentPeriod} ${getTranslation('period-unit')}`;
     } else {
-        // 加时赛：如果 currentPeriod 为 5，显示加时 1，依此类推
-        const otCount = gameState.currentPeriod - 4;
+        // 加时赛：如果 currentPeriod > totalPeriods
+        const otCount = gameState.currentPeriod - totalPeriods;
         periodText = currentLang === 'zh' ? `加时赛 ${otCount}` : `OT ${otCount}`;
     }
     document.getElementById('period-display').textContent = periodText;
