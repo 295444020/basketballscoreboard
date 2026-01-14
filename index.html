@@ -32,37 +32,37 @@
         }
 
         /* ---------------------------------- 全局布局 ---------------------------------- */
-.modal {
-    display: none; 
-    position: fixed;     /* 改为固定定位，相对于屏幕 */
-    z-index: 9999;      /* 确保在最上层 */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8); /* 半透明背景 */
-}
-.modal-content {
-    background-color: #1a1a1a;
-    margin: auto;
-    padding: 30px;
-    border: 2px solid var(--color-primary);
-    width: 80%;
-    max-width: 500px;
-    border-radius: 10px;
-    position: absolute;  /* 绝对定位配合 transform 居中 */
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
-    text-align: center;
-}
-#modal-actions {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
+        .modal {
+            display: none; 
+            position: fixed;     /* 改为固定定位，相对于屏幕 */
+            z-index: 9999;      /* 确保在最上层 */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* 半透明背景 */
+        }
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: auto;
+            padding: 30px;
+            border: 2px solid var(--color-primary);
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            position: absolute;  /* 绝对定位配合 transform 居中 */
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.2);
+            text-align: center;
+        }
+        #modal-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
         .header {
             width: 90%;
             max-width: 1600px; /* 适配 1920 宽度 */
@@ -292,6 +292,10 @@
                     <input type="number" id="total-periods-input" value="4" min="1" max="10">
                 </div>
                 <div class="control-group">
+                    <label for="overtime-duration-input" id="label-overtime-duration"></label>
+                    <input type="number" id="overtime-duration-input" value="300" min="1" max="3600">
+                </div>
+                <div class="control-group">
                     <label for="shot-clock-input" id="label-shot-clock"></label>
                     <input type="number" id="shot-clock-input" value="24" min="1" max="60">
                 </div>
@@ -334,6 +338,7 @@
                         <button class="btn primary" onclick="updateScore('a', 1)">+1 分</button>
                         <button class="btn primary" onclick="updateScore('a', 2)">+2 分</button>
                         <button class="btn primary" onclick="updateScore('a', 3)">+3 分</button>
+                        <button class="btn" onclick="updateScore('a', -1)">-1 分</button>
                         <button class="btn" onclick="updateFoul('a', 1)">+1 犯规</button>
                         <button class="btn" onclick="updateFoul('a', -1)">-1 犯规</button>
                         <button class="btn" onclick="updateTimeout('a', 1)">+1 暂停</button>
@@ -346,6 +351,7 @@
                         <button class="btn primary" onclick="updateScore('b', 1)">+1 分</button>
                         <button class="btn primary" onclick="updateScore('b', 2)">+2 分</button>
                         <button class="btn primary" onclick="updateScore('b', 3)">+3 分</button>
+                        <button class="btn" onclick="updateScore('b', -1)">-1 分</button>
                         <button class="btn" onclick="updateFoul('b', 1)">+1 犯规</button>
                         <button class="btn" onclick="updateFoul('b', -1)">-1 犯规</button>
                         <button class="btn" onclick="updateTimeout('b', 1)">+1 暂停</button>
@@ -404,6 +410,7 @@
             // 比赛参数 (需点击应用)
             periodDuration: 300, // 5 minutes in seconds
             totalPeriods: 4,
+            overtimeDuration: 300, // 加时赛时长，默认5分钟
             shotClockInitial: 24,
 
             // 比赛实时状态
@@ -451,7 +458,8 @@
                 'label-coach-a': '队伍 A 主教练',
                 'label-coach-b': '队伍 B 主教练',
                 'label-period-duration': '每节时长 (秒)',
-                'label-total-periods': '总结数',
+                'label-total-periods': '常规节数',
+                'label-overtime-duration': '加时赛时长 (秒)',
                 'label-shot-clock': '进攻时钟 (秒)',
                 'apply-settings-btn': '应用比赛参数',
                 'team-player-title': '球员信息 (实时保存)',
@@ -484,6 +492,7 @@
                 'msg-game-paused': '比赛已暂停！',
                 'msg-period-end': '第 {0} 节比赛结束，比分 {1} - {2}',
                 'msg-game-end': '比赛结束！最终比分 {0} - {1}',
+                'msg-ot-start': '进入加时赛 {0}！',
                 'msg-reset-confirm': '您确定要重置所有比赛信息吗？此操作不可撤销。',
                 'msg-settings-applied': '比赛参数已应用。',
                 'msg-foul-max': '队伍犯规已达上限 (5次)。',
@@ -507,7 +516,8 @@
                 'label-coach-a': 'Team A Head Coach',
                 'label-coach-b': 'Team B Head Coach',
                 'label-period-duration': 'Period Duration (Seconds)',
-                'label-total-periods': 'Total Periods',
+                'label-total-periods': 'Reg. Periods',
+                'label-overtime-duration': 'OT Duration (Seconds)',
                 'label-shot-clock': 'Shot Clock (Seconds)',
                 'apply-settings-btn': 'Apply Game Parameters',
                 'team-player-title': 'Player Info (Real-time Saved)',
@@ -540,6 +550,7 @@
                 'msg-game-paused': 'Game Paused!',
                 'msg-period-end': 'End of Period {0}, Score {1} - {2}',
                 'msg-game-end': 'Game Over! Final Score {0} - {1}',
+                'msg-ot-start': 'Entering OT {0}!',
                 'msg-reset-confirm': 'Are you sure you want to reset all game data? This cannot be undone.',
                 'msg-settings-applied': 'Game parameters applied.',
                 'msg-foul-max': 'Team foul limit (5) reached.',
@@ -649,10 +660,12 @@
             document.getElementById('settings-title').textContent = getTranslation('settings-title');
             document.getElementById('label-period-duration').textContent = getTranslation('label-period-duration');
             document.getElementById('label-total-periods').textContent = getTranslation('label-total-periods');
+            document.getElementById('label-overtime-duration').textContent = getTranslation('label-overtime-duration');
             document.getElementById('label-shot-clock').textContent = getTranslation('label-shot-clock');
             document.getElementById('apply-settings-btn').textContent = getTranslation('apply-settings-btn');
             document.getElementById('period-duration-input').value = gameState.periodDuration;
             document.getElementById('total-periods-input').value = gameState.totalPeriods;
+            document.getElementById('overtime-duration-input').value = gameState.overtimeDuration;
             document.getElementById('shot-clock-input').value = gameState.shotClockInitial;
 
             // 球员信息
@@ -759,9 +772,14 @@
                 showModal('msg-game-paused');
                 saveGameState(); // 状态改变，保存
             } else {
-                if (gameState.timer <= 0 && gameState.currentPeriod >= gameState.totalPeriods) {
-                    showModal('msg-game-end', gameState.scoreA, gameState.scoreB);
-                    return;
+                if (gameState.timer <= 0) {
+                    // 如果计时为0，且在最后一节（非加时）或加时结束，才显示结束。
+                    // 但通常用户需先重置或进入下一节，这里只做简单提示
+                    // 实际上如果在OT阶段，时间为0，也需要结束提示
+                     if (gameState.currentPeriod >= gameState.totalPeriods && gameState.scoreA !== gameState.scoreB) {
+                         showModal('msg-game-end', gameState.scoreA, gameState.scoreB);
+                         return;
+                     }
                 }
                 
                 gameState.isTimerRunning = true;
@@ -784,12 +802,16 @@
                         gameState.isTimerRunning = false;
                         
                         recordPeriodScore();
+                        
+                        // 判断是否为常规赛结束或加时赛结束
+                        const isRegulationEnd = gameState.currentPeriod === gameState.totalPeriods;
+                        const isOvertime = gameState.currentPeriod > gameState.totalPeriods;
+                        
+                        // 结束提示
+                        showModal('msg-period-end', gameState.currentPeriod, gameState.scoreA, gameState.scoreB);
 
-                        if (gameState.currentPeriod < gameState.totalPeriods) {
-                             showModal('msg-period-end', gameState.currentPeriod, gameState.scoreA, gameState.scoreB);
-                        } else {
-                             showModal('msg-game-end', gameState.scoreA, gameState.scoreB);
-                        }
+                        // 自动触发一次保存
+                        saveGameState();
                     }
                 }, 1000);
 
@@ -816,7 +838,14 @@
             clearInterval(gameState.timerInterval);
             clearInterval(gameState.shotClockInterval);
             gameState.isTimerRunning = false;
-            gameState.timer = gameState.periodDuration;
+            
+            // 如果是加时赛阶段，使用加时赛时长
+            if (gameState.currentPeriod > gameState.totalPeriods) {
+                gameState.timer = gameState.overtimeDuration;
+            } else {
+                gameState.timer = gameState.periodDuration;
+            }
+
             resetShotClock(); // 重置进攻时钟
             updateTimerButton();
             saveGameState(); // 状态改变，保存
@@ -831,7 +860,7 @@
         }
 
         /**
-         * 下一节比赛
+         * 下一节比赛 (包含加时赛逻辑)
          */
         function nextPeriod() {
             if (gameState.timer > 0) {
@@ -843,13 +872,31 @@
                 recordPeriodScore();
             }
 
+            const isTied = gameState.scoreA === gameState.scoreB;
+            const isRegulationEnd = gameState.currentPeriod === gameState.totalPeriods;
+            const isOvertime = gameState.currentPeriod > gameState.totalPeriods;
+
             if (gameState.currentPeriod < gameState.totalPeriods) {
+                // 正常进入下一节常规赛
                 gameState.currentPeriod++;
                 resetTimer(); // 重置计时器到设置时长
                 renderUI();
-                saveGameState(); // 状态改变，保存
-            } else {
-                showModal('msg-game-end', gameState.scoreA, gameState.scoreB);
+                saveGameState(); 
+            } else if (isRegulationEnd || isOvertime) {
+                // 常规赛最后一节结束 或 加时赛结束
+                if (isTied) {
+                    // 比分打平，进入（下一个）加时赛
+                    gameState.currentPeriod++;
+                    resetTimer(); // 将会自动使用加时赛时长
+                    renderUI();
+                    saveGameState();
+                    
+                    const otCount = gameState.currentPeriod - gameState.totalPeriods;
+                    showModal('msg-ot-start', otCount);
+                } else {
+                    // 比分未打平，比赛结束
+                    showModal('msg-game-end', gameState.scoreA, gameState.scoreB);
+                }
             }
         }
 
@@ -862,7 +909,12 @@
             } else {
                 gameState.scoreB = Math.max(0, gameState.scoreB + points);
             }
-            resetShotClock(); // 每次得分后重置进攻时钟
+            
+            // 只有在加分时才重置进攻时钟 (防止误操作扣分时重置)
+            if (points > 0) {
+                resetShotClock(); 
+            }
+            
             saveGameState(); // 状态改变，保存
         }
 
@@ -914,9 +966,13 @@
                 scoreB: gameState.scoreB,
                 timestamp: new Date().toLocaleString(),
             };
-            gameState.periodScores.push(currentScore);
-            renderScoreLog();
-            saveGameState(); // 保存记录
+            // 避免重复记录同一节
+            const exists = gameState.periodScores.find(p => p.period === gameState.currentPeriod);
+            if (!exists) {
+                gameState.periodScores.push(currentScore);
+                renderScoreLog();
+                saveGameState(); // 保存记录
+            }
         }
 
         // ---------------------------------- 本地存储与实时保存 ----------------------------------
@@ -962,6 +1018,7 @@
                 // 需点击应用的参数
                 periodDuration: gameState.periodDuration,
                 totalPeriods: gameState.totalPeriods,
+                overtimeDuration: gameState.overtimeDuration,
                 shotClockInitial: gameState.shotClockInitial,
                 
                 // 球员名称、得分和犯规
@@ -1006,6 +1063,7 @@
                 // 加载参数 (需应用)
                 gameState.periodDuration = loadedData.periodDuration || gameState.periodDuration;
                 gameState.totalPeriods = loadedData.totalPeriods || gameState.totalPeriods;
+                gameState.overtimeDuration = loadedData.overtimeDuration || gameState.overtimeDuration;
                 gameState.shotClockInitial = loadedData.shotClockInitial || gameState.shotClockInitial;
                 
                 // 加载球员名称、得分和犯规
@@ -1077,7 +1135,7 @@
                 totalB = p.scoreB;
             });
             
-            logText += `\n${getTranslation('msg-game-end', totalA, totalB)}\n`;
+            logText += `\n${getTranslation('msg-game-end', gameState.scoreA, gameState.scoreB)}\n`;
 
             document.getElementById('score-log-output').value = logText;
         }
@@ -1151,6 +1209,7 @@
                     coachB: "刘教练",
                     periodDuration: 300,
                     totalPeriods: 4,
+                    overtimeDuration: 300,
                     shotClockInitial: 24,
                     currentPeriod: 1,
                     timer: 300,
@@ -1180,11 +1239,13 @@
         function applySettings() {
             const newDuration = parseInt(document.getElementById('period-duration-input').value);
             const newPeriods = parseInt(document.getElementById('total-periods-input').value);
+            const newOtDuration = parseInt(document.getElementById('overtime-duration-input').value);
             const newShotClock = parseInt(document.getElementById('shot-clock-input').value);
             
             // 确保值合法
             gameState.periodDuration = (newDuration > 0 && newDuration <= 3600) ? newDuration : 300;
             gameState.totalPeriods = (newPeriods > 0 && newPeriods <= 10) ? newPeriods : 4;
+            gameState.overtimeDuration = (newOtDuration > 0 && newOtDuration <= 3600) ? newOtDuration : 300;
             gameState.shotClockInitial = (newShotClock > 0 && newShotClock <= 60) ? newShotClock : 24;
             
             // 应用设置并重置当前比赛状态
